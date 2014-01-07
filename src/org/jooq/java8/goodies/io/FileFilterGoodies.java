@@ -46,26 +46,42 @@ import java.util.function.Consumer;
  */
 public class FileFilterGoodies {
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String args[]) {
         listRecursive(new File("."));
     }
 
+    /**
+     * This method recursively lists all
+     * .txt and .java files in a directory
+     */
     private static void listRecursive(File dir) {
-        Arrays.stream(dir.listFiles((file, name) -> (
-                     file.isDirectory()
-                  || name.endsWith(".txt")
-                  || name.endsWith(".java"))
+        Arrays.stream(dir.listFiles((f, n) ->
+                     !n.startsWith(".")
+                  &&
+                     (f.isDirectory()
+                  ||  n.endsWith(".txt")
+                  ||  n.endsWith(".java"))
               ))
               .forEach(unchecked((file) -> {
-                  System.out.println(file.getCanonicalPath());
+                  System.out.println(
+                      file.getCanonicalPath()
+                          .substring(new File(".")
+                          .getCanonicalPath()
+                          .length()));
 
-                  if (file.isDirectory()) {
-                      listRecursive(file);
-                  }
+                      if (file.isDirectory()) {
+                          listRecursive(file);
+                      }
               }));
     }
 
-    private static <T> Consumer<T> unchecked(CheckedConsumer<T> consumer) {
+    /**
+     * This utility simply wraps a functional
+     * interface that throws a checked exception
+     * into a Java 8 Consumer
+     */
+    private static <T> Consumer<T>
+    unchecked(CheckedConsumer<T> consumer) {
         return t -> {
             try {
                 consumer.accept(t);
@@ -76,6 +92,7 @@ public class FileFilterGoodies {
         };
     }
 
+    @FunctionalInterface
     private interface CheckedConsumer<T> {
         void accept(T t) throws Exception;
     }
