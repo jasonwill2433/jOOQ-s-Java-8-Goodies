@@ -37,25 +37,53 @@ package org.jooq.java8.goodies.xml;
 
 import static org.joox.JOOX.$;
 
-import org.joox.JOOX;
-import org.xml.sax.SAXException;
-
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Lukas Eder
  */
 public class XmlGoodies {
     public static void main(String[] args) throws Exception {
+        System.out.println("Find all artifacts and print them in 'Maven notation'");
+        System.out.println("-----------------------------------------------------");
         $(new File("./pom.xml"))
             .find("groupId")
             .each(ctx -> {
                 System.out.println(
-                    $(ctx).text() + ":" +
-                    $(ctx).siblings("artifactId").text() + ":" +
-                    $(ctx).siblings("version").text()
-                );
+                $(ctx).text() + ":" +
+                $(ctx).siblings("artifactId").text() + ":" +
+                $(ctx).siblings("version").text());
             });
+
+        System.out.println();
+        System.out.println("Find all non-SNAPSHOT artifacts and print them in 'Maven notation'");
+        System.out.println("------------------------------------------------------------------");
+        $(new File("./pom.xml"))
+            .find("groupId")
+            .filter(ctx -> $(ctx).siblings("version")
+                    .matchText(".*-SNAPSHOT")
+                    .isEmpty())
+            .each(ctx -> {
+                System.out.println(
+                $(ctx).text() + ":" +
+                $(ctx).siblings("artifactId").text() + ":" +
+                $(ctx).siblings("version").text());
+            });
+
+        System.out.println();
+        System.out.println("Find all non-SNAPSHOT artifacts that aren't dependencies and print them in 'Maven notation'");
+        System.out.println("-------------------------------------------------------------------------------------------");
+        $(new File("./pom.xml"))
+            .find("groupId")
+            .filter(ctx -> $(ctx).siblings("version")
+                                 .matchText(".*-SNAPSHOT")
+                                 .isEmpty())
+            .content(ctx ->
+                $(ctx).text() + ":" +
+                $(ctx).siblings("artifactId").text() + ":" +
+                $(ctx).siblings("version").text()
+            )
+            .rename("artifact")
+            .each(ctx -> System.out.println(ctx));
     }
 }
