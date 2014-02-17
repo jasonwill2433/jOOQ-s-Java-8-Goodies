@@ -97,7 +97,7 @@ public class MapGoodies {
         Map<String, Integer> map = map();
 
         map.put("X", null);
-        System.out.println(map.merge("X", null, (v1, v2) -> null));
+        System.out.println(map.merge("X", 1, (v1, v2) -> null));
         System.out.println(map);
     }
 
