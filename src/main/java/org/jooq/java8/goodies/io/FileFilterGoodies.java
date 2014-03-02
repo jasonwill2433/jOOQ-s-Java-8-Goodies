@@ -35,9 +35,10 @@
  */
 package org.jooq.java8.goodies.io;
 
+import org.jooq.lambda.Unchecked;
+
 import java.io.File;
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 /**
  * Java 8's lambda expressions greatly improve using the <code>java.io</code> package.
@@ -63,38 +64,18 @@ public class FileFilterGoodies {
                   ||  n.endsWith(".txt")
                   ||  n.endsWith(".java"))
               ))
-              .forEach(unchecked((file) -> {
+              .forEach(Unchecked.consumer((file) -> {
                   System.out.println(
                       file.getCanonicalPath()
-                          .substring(new File(".")
+                          .substring(
+                              new File(".")
                                   .getCanonicalPath()
-                                  .length()));
+                                  .length()
+                          ));
 
                       if (file.isDirectory()) {
                           listRecursive(file);
                       }
               }));
-    }
-
-    /**
-     * This utility simply wraps a functional
-     * interface that throws a checked exception
-     * into a Java 8 Consumer
-     */
-    private static <T> Consumer<T>
-    unchecked(CheckedConsumer<T> consumer) {
-        return t -> {
-            try {
-                consumer.accept(t);
-            }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        };
-    }
-
-    @FunctionalInterface
-    private interface CheckedConsumer<T> {
-        void accept(T t) throws Exception;
     }
 }
