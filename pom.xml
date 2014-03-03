@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jool</artifactId>
-            <version>0.9.0</version>
+            <version>0.9.1-SNAPSHOT</version>
         </dependency>
 
         <!-- Database APIs -->
