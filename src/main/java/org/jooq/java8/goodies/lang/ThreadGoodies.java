@@ -38,6 +38,7 @@ package org.jooq.java8.goodies.lang;
 import org.jooq.lambda.Unchecked;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -50,6 +51,7 @@ public class ThreadGoodies {
     public static void main(String[] args) {
         jdk1_0();
         jdk5();
+        jdk8();
     }
 
     public static int longOperation() {
@@ -99,9 +101,18 @@ public class ThreadGoodies {
             service.submit(ThreadGoodies::longOperation)
         };
 
-        Arrays.stream(answers).forEach(
-            Unchecked.consumer(
-                (Future<Integer> f) -> System.out.println(f.get())
-            ));
+        Arrays.stream(answers).forEach(Unchecked.consumer(
+            f -> System.out.println(f.get())
+        ));
+    }
+
+    /**
+     * Improvements introduced in the JDK 8
+     */
+    private static void jdk8() {
+        Arrays.stream(new int[]{1, 2, 3, 4, 5, 6})
+              .parallel()
+              .max()
+              .ifPresent(System.out::println);
     }
 }
