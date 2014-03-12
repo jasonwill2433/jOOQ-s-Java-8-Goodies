@@ -43,6 +43,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -74,6 +76,20 @@ public class SQLGoodies {
         try (Connection c = getConnection("jdbc:h2:~/test", "sa", "")) {
             String sql = "select schema_name, is_default from information_schema.schemata order by schema_name";
 
+            System.out.println("Fetching data into a with JDBC / Java 7 syntax");
+            System.out.println("----------------------------------------------");
+            try (PreparedStatement stmt = c.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+                    System.out.println(
+                        new Schema(rs.getString("SCHEMA_NAME"),
+                                   rs.getBoolean("IS_DEFAULT"))
+                    );
+                }
+            }
+
+            System.out.println();
             System.out.println("Fetching data into a lambda expression with jOOQ");
             System.out.println("------------------------------------------------");
             DSL.using(c)
