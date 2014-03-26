@@ -33,69 +33,56 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.jooq.java8.goodies.lang;
+package org.jooq.java8.goodies.util;
 
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.IntStream;
+import java.util.*;
 
 /**
  * @author Lukas Eder
  */
-public class CacheGoodies {
+public class OptionalGoodies {
 
-    public static void main(String[] args) {
-        for (int i = 0; i < 10; i++)
-            System.out.println("f(" + i + ") = " + fibonacci(i));
+    public static void main(String[] args) throws Exception {
+        Optional<String> stringOrNot = Optional.of("123");
 
-        System.out.println(cache);
+        // This String reference will never be null
+        String alwaysAString = stringOrNot.orElse("");
+        System.out.println(alwaysAString);
 
-        for (int i = 0; i < 10; i++)
-            System.out.println("f(" + i + ") = " + fibonacciJava7(i));
+        // This Integer reference will be wrapped again
+        Optional<Integer> integerOrNot = stringOrNot.map(Integer::parseInt);
+        System.out.println(integerOrNot);
 
-        System.out.println(cacheJava7);
+        // This int reference will never be null
+        int alwaysAnInt = stringOrNot
+                .map(s -> Integer.parseInt(s))
+                .orElse(0);
+        System.out.println(alwaysAnInt);
+
+        // Streams also make heavy use of Optional types
+        Optional<Integer> anyInteger =
+        Arrays.asList(1, 2, 3)
+              .stream()
+              .filter(i -> i % 2 == 0)
+              .findAny();
+        anyInteger.ifPresent(System.out::println);
+
+        // Primitive types
+        OptionalInt anyInt =
+        Arrays.stream(new int[] {1, 2, 3})
+              .filter(i -> i % 2 == 0)
+              .findAny();
+
+        anyInt.ifPresent(System.out::println);
     }
 
-    static Map<Integer, Integer> cache = new ConcurrentHashMap<>();
+    <T> void method() {
+        Collection<Optional<? extends T>> source = new ArrayList<>();
+        Collection<Optional<? super T>> target = new ArrayList<>();
 
-    static int fibonacci(int i) {
-        if (i == 0)
-            return i;
+        Optional<? extends T> s = source.iterator().next();
 
-        if (i == 1)
-            return 1;
-
-        return cache.computeIfAbsent(i, (key) -> {
-            System.out.println("Slow calculation of " + key);
-            return fibonacci(i - 2) + fibonacci(i - 1);
-        });
-    }
-
-    static Map<Integer, Integer> cacheJava7 = new ConcurrentHashMap<>();
-
-    static int fibonacciJava7(int i) {
-        if (i == 0)
-            return i;
-
-        if (i == 1)
-            return 1;
-
-        Integer result = cacheJava7.get(i);
-        if (result == null) {
-            synchronized (cacheJava7) {
-                result = cacheJava7.get(i);
-                if (result == null) {
-                    System.out.println("Slow calculation of " + i);
-                    result = fibonacci(i - 2) + fibonacci(i - 1);
-                    cacheJava7.put(i, result);
-                }
-            }
-        }
-
-        return result;
+// ... cannot put it into the target
+        target.add(s); // Nope
     }
 }
-
