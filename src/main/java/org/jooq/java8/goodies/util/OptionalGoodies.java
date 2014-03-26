@@ -82,7 +82,7 @@ public class OptionalGoodies {
 
         Optional<? extends T> s = source.iterator().next();
 
-// ... cannot put it into the target
-        target.add(s); // Nope
+        // ... cannot put it into the target
+        // target.add(s); // Nope
     }
 }
