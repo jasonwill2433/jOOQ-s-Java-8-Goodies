@@ -13,3 +13,6 @@ from Maven. They currently cannot be loaded
 For more goodies, visit our blog:
 http://blog.jooq.org/tag/java-8/
 http://blog.jooq.org/2014/02/14/java-8-friday-goodies-map-enhancements/
+
+Java 8 Cheat sheet:
+http://www.java8.org/
